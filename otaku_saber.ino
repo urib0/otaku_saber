@@ -6,6 +6,7 @@
 #define PIN_SW_R   0
 #define PIN_SW_A   4
 #define PIN_SW_B   3
+#define NUMPIXELS  1
 #define TICK      10 // 制御ループの周期
 
 typedef signed char c;
