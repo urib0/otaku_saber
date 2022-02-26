@@ -9,7 +9,14 @@
 #define NUMPIXELS 1 // Popular NeoPixel ring size
 #define DELAYVAL 50 // Time (in milliseconds) to pause between pixels
 
-unsigned long time;
+typedef signed char c;
+typedef unsigned char uc;
+typedef signed int i;
+typedef unsigned int ui;
+typedef signed long l;
+typedef unsigned long ul;
+
+ul time;
 
 Adafruit_NeoPixel pixels(NUMPIXELS, PIN, NEO_GRB + NEO_KHZ800);
 
@@ -27,7 +34,7 @@ void setup() {
 }
 
 void loop() {
-  static int color_r = 0;
+  static i color_r = 0;
 
   // 処理時間計測開始
   time = millis();
