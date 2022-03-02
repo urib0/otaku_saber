@@ -53,7 +53,7 @@ void loop() {
   switch_detection();
 
   // 処理時間表示
-  Serial.println(time);
-  delay(10);
+  delay(TICK);
+  Serial.println(millis()-time);
 
 }
