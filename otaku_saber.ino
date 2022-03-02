@@ -8,7 +8,7 @@
 #define PIN_SW_A   4
 #define PIN_SW_B   3
 #define NUMPIXELS  1
-#define TICK      10 // 制御ループの周期
+#define TICK      100 // 制御ループの周期
 
 ul time;
 
@@ -23,9 +23,47 @@ uc switch_detection(){
   tmp |= (!digitalRead(PIN_SW_C)) << 3;
   tmp |= (!digitalRead(PIN_SW_L)) << 4;
 
-  Serial.println(tmp);
-
   return tmp;
+}
+
+uc switch_state(uc sw){
+  static uc sw_old = 0;
+  static bool flg_sw_block = false;  // 渡り押しフラグ
+  uc res = PUSH_NONE;
+
+  // スイッチが離された
+  if(sw==PUSH_NONE){
+    // 前回何かしらのスイッチが押されていた
+    if(sw_old!=PUSH_NONE){
+      switch (sw_old)
+      {
+      case PUSH_L:
+      case PUSH_C:
+      case PUSH_R:
+      case PUSH_A:
+      case PUSH_B:
+        if(!flg_sw_block){
+          res = sw_old;
+        }
+        break;
+      default:
+        res = PUSH_NONE;
+        break;
+      }
+      flg_sw_block = false;
+    }
+  }
+  // スイッチが押されている
+  else{
+    // 前回とスイッチの状態が違う(渡り押し)
+    if((sw_old!=PUSH_NONE)&&(sw_old!=sw)){
+      flg_sw_block = true;
+    }
+  }
+
+  sw_old = sw;
+
+  return res;
 }
 
 void setup() {
@@ -46,11 +84,13 @@ void setup() {
 
 void loop() {
   static i color_r = 0;
+  uc sw = 0;
 
   // 処理時間計測開始
   time = millis();
 
-  switch_detection();
+  sw = switch_detection();
+  Serial.println(switch_state(sw));
 
   // 処理時間表示
   delay(TICK);
