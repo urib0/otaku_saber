@@ -8,7 +8,7 @@
 #define PIN_SW_A    4
 #define PIN_SW_B    3
 #define NUMPIXELS   1
-#define TICK        200  // 制御ループの周期[ms]
+#define TICK        10  // 制御ループの周期[ms]
 #define LONG_PUSH_T 1000 // 長押し検知時間[ms]
 #define COLOR_ARRAY_SIZE 7
 
@@ -132,7 +132,7 @@ void loop() {
 //  Serial.print("state:");
 //  Serial.println(state);
   sw = switch_state(switch_detection());
-  Serial.print(sw);
+//  Serial.print(sw);
 
   // 状態遷移
   switch (state)
@@ -140,7 +140,7 @@ void loop() {
   case MODE_SLEEP:
     if(sw == (PUSH_C | PUSH_LONG)){
       state = MODE_NORMAL;
-      color_next = pixels.Color(30,30,30);
+      color_next = color_aaray[0];
     }
     break;
   case MODE_NORMAL:
@@ -150,19 +150,27 @@ void loop() {
       state = MODE_DEBUG;
       break;
     case PUSH_L:
-      color_next = color_aaray[color_num];
       if(color_num>0){
         color_num--;
       }
+      else{
+        color_num = COLOR_ARRAY_SIZE-1;
+      }
+      color_next = color_aaray[color_num];
       break;
     case PUSH_R:
-      color_next = color_aaray[color_num];
       if(color_num<(COLOR_ARRAY_SIZE-1)){
         color_num++;
       }
+      else{
+        color_num = 0;
+      }
+      color_next = color_aaray[color_num];
       break;
     case PUSH_C|PUSH_LONG:
       state = MODE_SLEEP;
+      color_next = 0;
+      color_num = 0;
       color_next = pixels.Color(0,0,0);
       break;
     case PUSH_A:
@@ -190,12 +198,6 @@ void loop() {
     break;
   }
 
-  Serial.print(",");
-  Serial.print(color_a);
-  Serial.print(",");
-  Serial.print(color_b);
-  Serial.print(",");
-  Serial.println(color_next);
 
   if(color_old!=color_next){
     pixels.setPixelColor(0, color_next);
