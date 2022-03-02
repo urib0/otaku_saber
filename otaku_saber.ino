@@ -45,13 +45,9 @@ uc switch_state(uc sw){
       case PUSH_R:
       case PUSH_A:
       case PUSH_B:
-        if(!flg_sw_block){
-          if(flg_sw_long){
-            res = sw_old | PUSH_LONG;
-          }
-          else{
-            res = sw_old;
-          }
+        // 単押し確定
+        if((!flg_sw_block)&&(!flg_sw_long)){
+          res = sw_old;
         }
         break;
       default:
@@ -79,6 +75,7 @@ uc switch_state(uc sw){
         // 長押し確定
         else{
           flg_sw_long = true;
+          res = sw_old | PUSH_LONG;
         }
       }
     }
@@ -100,7 +97,9 @@ void setup() {
   pinMode(PIN_SW_B, INPUT);
   Serial.begin(9600);      // 9600bpsでシリアルポートを開く
   pixels.begin(); // INITIALIZE NeoPixel strip object (REQUIRED)
-  delay(10);
+  delay(5);
+  pixels.setPixelColor(0, pixels.Color(0, 0, 0));
+  pixels.show();
 }
 
 void loop() {
@@ -121,7 +120,7 @@ void loop() {
   case MODE_SLEEP:
     if(sw == (PUSH_C | PUSH_LONG)){
       state = MODE_NORMAL;
-      pixels.setPixelColor(0, pixels.Color(0, 10, 0));
+      pixels.setPixelColor(0, pixels.Color(10, 10, 10));
       pixels.show();
     }
     break;
