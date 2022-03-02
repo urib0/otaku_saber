@@ -125,6 +125,11 @@ void loop() {
     }
     break;
   case MODE_NORMAL:
+    if(sw == (PUSH_A|PUSH_B|PUSH_LONG)){
+      state = MODE_DEBUG;
+    }
+    break;
+  case MODE_DEBUG:
     break;
   
   default:

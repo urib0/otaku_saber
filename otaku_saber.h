@@ -18,7 +18,8 @@ typedef unsigned long   ul;
 
 enum MODE{
     MODE_SLEEP,
-    MODE_NORMAL
+    MODE_NORMAL,
+    MODE_DEBUG
 };
 
 #endif
