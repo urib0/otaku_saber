@@ -12,6 +12,7 @@
 #define LONG_PUSH_T 1000 // 長押し検知時間[ms]
 #define COLOR_ARRAY_SIZE 7
 
+
 Adafruit_NeoPixel pixels(NUMPIXELS, PIN_DO, NEO_GRB + NEO_KHZ800);
 
 ul time;
