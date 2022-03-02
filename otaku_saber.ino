@@ -8,7 +8,7 @@
 #define PIN_SW_A    4
 #define PIN_SW_B    3
 #define NUMPIXELS   1
-#define TICK        100  // 制御ループの周期[ms]
+#define TICK        10  // 制御ループの周期[ms]
 #define LONG_PUSH_T 1000 // 長押し検知時間[ms]
 #define COLOR_ARRAY_SIZE 7
 
@@ -111,6 +111,7 @@ void setup() {
   Serial.begin(9600);      // 9600bpsでシリアルポートを開く
   pixels.begin(); // INITIALIZE NeoPixel strip object (REQUIRED)
   delay(5);
+  pixels.setBrightness(50);
   pixels.setPixelColor(0, pixels.Color(0, 0, 0));
   pixels.show();
 }
@@ -136,7 +137,7 @@ void loop() {
   case MODE_SLEEP:
     if(sw == (PUSH_C | PUSH_LONG)){
       state = MODE_NORMAL;
-      color_next = pixels.Color(10,10,10);
+      color_next = pixels.Color(30,30,30);
     }
     break;
   case MODE_NORMAL:
@@ -159,7 +160,7 @@ void loop() {
       break;
     case PUSH_C|PUSH_LONG:
       state = MODE_SLEEP;
-      color_next = pixels.Color(10,10,10);
+      color_next = pixels.Color(0,0,0);
       break;
     default:
       break;
