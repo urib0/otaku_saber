@@ -8,7 +8,7 @@
 #define PIN_SW_A    4
 #define PIN_SW_B    3
 #define NUMPIXELS   1
-#define TICK        10  // 制御ループの周期[ms]
+#define TICK        200  // 制御ループの周期[ms]
 #define LONG_PUSH_T 1000 // 長押し検知時間[ms]
 #define COLOR_ARRAY_SIZE 7
 
@@ -16,6 +16,8 @@ Adafruit_NeoPixel pixels(NUMPIXELS, PIN_DO, NEO_GRB + NEO_KHZ800);
 
 ul time;
 static uint32_t color = pixels.Color(0, 0, 0);
+static uint32_t color_a = pixels.Color(200, 200, 200);
+static uint32_t color_b = pixels.Color(200, 200, 200);
 static uint32_t color_aaray[COLOR_ARRAY_SIZE] = {
   pixels.Color(255,0,0),
   pixels.Color(255,165,0),
@@ -127,9 +129,10 @@ void loop() {
   // 処理時間計測開始
   time = millis();
 
-  Serial.print("state:");
-  Serial.println(state);
+//  Serial.print("state:");
+//  Serial.println(state);
   sw = switch_state(switch_detection());
+  Serial.print(sw);
 
   // 状態遷移
   switch (state)
@@ -162,6 +165,20 @@ void loop() {
       state = MODE_SLEEP;
       color_next = pixels.Color(0,0,0);
       break;
+    case PUSH_A:
+      color_next = color_a;
+      break;
+    case PUSH_B:
+      color_next = color_b;
+      break;
+    case PUSH_A|PUSH_LONG:
+      color_a = color_old;
+      color_next = color_a;
+      break;
+    case PUSH_B|PUSH_LONG:
+      color_b = color_old;
+      color_next = color_b;
+      break;
     default:
       break;
     }
@@ -172,6 +189,13 @@ void loop() {
   default:
     break;
   }
+
+  Serial.print(",");
+  Serial.print(color_a);
+  Serial.print(",");
+  Serial.print(color_b);
+  Serial.print(",");
+  Serial.println(color_next);
 
   if(color_old!=color_next){
     pixels.setPixelColor(0, color_next);
