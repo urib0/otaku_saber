@@ -1,14 +1,15 @@
 #include <Adafruit_NeoPixel.h>
 #include "otaku_saber.h"
 
-#define PIN_DO     6
-#define PIN_SW_L   2
-#define PIN_SW_C   1
-#define PIN_SW_R   0
-#define PIN_SW_A   4
-#define PIN_SW_B   3
-#define NUMPIXELS  1
-#define TICK      100 // 制御ループの周期
+#define PIN_DO      6
+#define PIN_SW_L    2
+#define PIN_SW_C    1
+#define PIN_SW_R    0
+#define PIN_SW_A    4
+#define PIN_SW_B    3
+#define NUMPIXELS   1
+#define TICK        200  // 制御ループの周期[ms]
+#define LONG_PUSH_T 1000 // 長押し検知時間[ms]
 
 ul time;
 
@@ -29,6 +30,8 @@ uc switch_detection(){
 uc switch_state(uc sw){
   static uc sw_old = 0;
   static bool flg_sw_block = false;  // 渡り押しフラグ
+  static bool flg_sw_long = false;   // 長押しフラグ
+  static ui sw_long_cnt = 0;         // 長押し検知カウンタ
   uc res = PUSH_NONE;
 
   // スイッチが離された
@@ -43,7 +46,12 @@ uc switch_state(uc sw){
       case PUSH_A:
       case PUSH_B:
         if(!flg_sw_block){
-          res = sw_old;
+          if(flg_sw_long){
+            res = sw_old | PUSH_LONG;
+          }
+          else{
+            res = sw_old;
+          }
         }
         break;
       default:
@@ -51,13 +59,28 @@ uc switch_state(uc sw){
         break;
       }
       flg_sw_block = false;
+      flg_sw_long = false;
+      sw_long_cnt = 0;
     }
   }
   // スイッチが押されている
   else{
-    // 前回とスイッチの状態が違う(渡り押し)
-    if((sw_old!=PUSH_NONE)&&(sw_old!=sw)){
-      flg_sw_block = true;
+    if(sw_old!=PUSH_NONE){
+      // 前回とスイッチの状態が違う(渡り押し)
+      if(sw_old!=sw){
+        flg_sw_block = true;
+        sw_long_cnt = 0;
+      }
+      // 連続押し
+      else{
+        if(sw_long_cnt<LONG_PUSH_T){
+          sw_long_cnt += TICK;
+        }
+        // 長押し確定
+        else{
+          flg_sw_long = true;
+        }
+      }
     }
   }
 
@@ -90,7 +113,8 @@ void loop() {
   time = millis();
 
   sw = switch_detection();
-  Serial.println(switch_state(sw));
+  Serial.print(switch_state(sw));
+  Serial.print(",");
 
   // 処理時間表示
   delay(TICK);
