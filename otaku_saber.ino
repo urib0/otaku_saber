@@ -155,6 +155,10 @@ void loop() {
         color_num++;
       }
       break;
+    case PUSH_C|PUSH_LONG:
+      state = MODE_SLEEP;
+      color_next = pixels.Color(10,10,10);
+      break;
     default:
       break;
     }
