@@ -101,20 +101,36 @@ void setup() {
   Serial.begin(9600);      // 9600bpsでシリアルポートを開く
   pixels.begin(); // INITIALIZE NeoPixel strip object (REQUIRED)
   delay(10);
-  pixels.setPixelColor(0, pixels.Color(0, 10, 0));
-  pixels.show();
 }
 
 void loop() {
   static i color_r = 0;
+  static enum MODE state = MODE_SLEEP;
   uc sw = 0;
 
   // 処理時間計測開始
   time = millis();
 
-  sw = switch_detection();
-  Serial.print(switch_state(sw));
-  Serial.print(",");
+  Serial.print("state:");
+  Serial.println(state);
+  sw = switch_state(switch_detection());
+
+  // 状態遷移
+  switch (state)
+  {
+  case MODE_SLEEP:
+    if(sw == (PUSH_C | PUSH_LONG)){
+      state = MODE_NORMAL;
+      pixels.setPixelColor(0, pixels.Color(0, 10, 0));
+      pixels.show();
+    }
+    break;
+  case MODE_NORMAL:
+    break;
+  
+  default:
+    break;
+  }
 
   // 処理時間表示
   delay(TICK);

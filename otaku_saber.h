@@ -16,4 +16,9 @@ typedef unsigned long   ul;
 #define PUSH_A          uc(0b000010)
 #define PUSH_B          uc(0b000001)
 
+enum MODE{
+    MODE_SLEEP,
+    MODE_NORMAL
+};
+
 #endif
