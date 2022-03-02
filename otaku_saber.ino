@@ -11,7 +11,7 @@
 #define TICK        10  // 制御ループの周期[ms]
 #define LONG_PUSH_T 1000 // 長押し検知時間[ms]
 #define COLOR_ARRAY_SIZE 7
-
+#define BLINK_INTERVAL 150 // ms
 
 Adafruit_NeoPixel pixels(NUMPIXELS, PIN_DO, NEO_GRB + NEO_KHZ800);
 
@@ -102,6 +102,20 @@ uc switch_state(uc sw){
   return res;
 }
 
+void led_blink(uint32_t color){
+  pixels.setPixelColor(0, 0);
+  pixels.show();
+  delay(BLINK_INTERVAL);
+  pixels.setPixelColor(0, color);
+  pixels.show();
+  delay(BLINK_INTERVAL);
+  pixels.setPixelColor(0, 0);
+  pixels.show();
+  delay(BLINK_INTERVAL);
+  pixels.setPixelColor(0, color);
+  pixels.show();
+}
+
 void setup() {
 #if defined(__AVR_ATtiny85__) && (F_CPU == 16000000)
   clock_prescale_set(clock_div_1);
@@ -114,7 +128,7 @@ void setup() {
   Serial.begin(9600);      // 9600bpsでシリアルポートを開く
   pixels.begin(); // INITIALIZE NeoPixel strip object (REQUIRED)
   delay(5);
-  pixels.setBrightness(50);
+  pixels.setBrightness(20);
   pixels.setPixelColor(0, pixels.Color(0, 0, 0));
   pixels.show();
 }
@@ -183,10 +197,12 @@ void loop() {
     case PUSH_A|PUSH_LONG:
       color_a = color_old;
       color_next = color_a;
+      led_blink(color_next);
       break;
     case PUSH_B|PUSH_LONG:
       color_b = color_old;
       color_next = color_b;
+      led_blink(color_next);
       break;
     default:
       break;
