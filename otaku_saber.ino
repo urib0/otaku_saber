@@ -8,12 +8,19 @@
 #define PIN_SW_A    4
 #define PIN_SW_B    3
 #define NUMPIXELS   1
-#define TICK        200  // 制御ループの周期[ms]
+#define TICK        100  // 制御ループの周期[ms]
 #define LONG_PUSH_T 1000 // 長押し検知時間[ms]
-
-ul time;
+#define COLOR_ARRAY_SIZE 3
 
 Adafruit_NeoPixel pixels(NUMPIXELS, PIN_DO, NEO_GRB + NEO_KHZ800);
+
+ul time;
+static uint32_t color = pixels.Color(0, 0, 0);
+static uint32_t color_aaray[COLOR_ARRAY_SIZE] = {
+  pixels.Color(10,0,0),
+  pixels.Color(0,10,0),
+  pixels.Color(0,0,10)
+};
 
 uc switch_detection(){
   uc tmp = 0;
@@ -103,8 +110,11 @@ void setup() {
 }
 
 void loop() {
-  static i color_r = 0;
+  static uint32_t color_old = 0;
+  static uint32_t color_next = 0;
   static enum MODE state = MODE_SLEEP;
+  static uc color_num = 0;
+  
   uc sw = 0;
 
   // 処理時間計測開始
@@ -120,13 +130,29 @@ void loop() {
   case MODE_SLEEP:
     if(sw == (PUSH_C | PUSH_LONG)){
       state = MODE_NORMAL;
-      pixels.setPixelColor(0, pixels.Color(10, 10, 10));
-      pixels.show();
+      color_next = pixels.Color(10,10,10);
     }
     break;
   case MODE_NORMAL:
-    if(sw == (PUSH_A|PUSH_B|PUSH_LONG)){
+    switch (sw)
+    {
+    case PUSH_A|PUSH_B|PUSH_LONG:
       state = MODE_DEBUG;
+      break;
+    case PUSH_L:
+      color_next = color_aaray[color_num];
+      if(color_num>0){
+        color_num--;
+      }
+      break;
+    case PUSH_R:
+      color_next = color_aaray[color_num];
+      if(color_num<(COLOR_ARRAY_SIZE-1)){
+        color_num++;
+      }
+      break;
+    default:
+      break;
     }
     break;
   case MODE_DEBUG:
@@ -136,8 +162,14 @@ void loop() {
     break;
   }
 
+  if(color_old!=color_next){
+    pixels.setPixelColor(0, color_next);
+    pixels.show();
+  }
+  color_old = color_next;
+
   // 処理時間表示
   delay(TICK);
-  Serial.println(millis()-time);
+//  Serial.println(millis()-time);
 
 }
