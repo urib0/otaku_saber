@@ -1,4 +1,5 @@
 #include <Adafruit_NeoPixel.h>
+#include "otaku_saber.h"
 
 #define PIN_DO     6
 #define PIN_SW_L   2
@@ -8,13 +9,6 @@
 #define PIN_SW_B   3
 #define NUMPIXELS  1
 #define TICK      10 // 制御ループの周期
-
-typedef signed char c;
-typedef unsigned char uc;
-typedef signed int i;
-typedef unsigned int ui;
-typedef signed long l;
-typedef unsigned long ul;
 
 ul time;
 
