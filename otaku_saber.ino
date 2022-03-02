@@ -85,8 +85,10 @@ uc switch_state(uc sw){
         }
         // 長押し確定
         else{
-          flg_sw_long = true;
-          res = sw_old | PUSH_LONG;
+          if(!flg_sw_long){
+            res = sw_old | PUSH_LONG;
+            flg_sw_long = true;
+          }
         }
       }
     }
